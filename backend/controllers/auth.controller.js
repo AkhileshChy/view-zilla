@@ -4,7 +4,7 @@ import { generateTokenAndSetCookie } from "../utils/generateTokens.js";
 
 export async function signup(req, res) {
     try {
-        const { email, password, username } = req.body;
+        const { email, username, password } = req.body;
         if (!email || !password || !username) {
             return res.status(400).json({ success: false, message: "All fields are required"});
         }
@@ -25,10 +25,13 @@ export async function signup(req, res) {
 		}
         const salt = await bcryptjs.genSalt(10);
         const hashedPassword = await bcryptjs.hash(password, salt);
+        const PROFILE_PICS = ["/avatar1.png", "/avatar2.png", "/avatar3.png"];
+        const image = PROFILE_PICS[Math.floor(Math.random() * PROFILE_PICS.length)];
         const newUser = new User({
             email,
             password: hashedPassword,
-            username
+            username,
+            image
         })
         generateTokenAndSetCookie(newUser._id, res);
         await newUser.save();
